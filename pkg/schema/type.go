@@ -5,6 +5,7 @@ package schema
 
 import (
 	"fmt"
+
 	"github.com/vmware-tanzu/carvel-ytt/pkg/filepos"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/template"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/yamlmeta"

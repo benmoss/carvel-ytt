@@ -44,10 +44,9 @@ func (v *ValidationAnnotation) GetNodeAnn() template.NodeAnnotation {
 	return v.nodeAnnotation
 }
 
-// A Rule represents an argument to an @schema/validation annotation;
+// A Rule represents an argument to @schema/validation annotation;
 // it contains a string description of what constitutes a valid value,
 // and a function that asserts the rule against an actual value.
-// One @schema/validation annotation can have multiple Rules.
 type Rule struct {
 	Msg       string
 	Assertion starlark.Callable
