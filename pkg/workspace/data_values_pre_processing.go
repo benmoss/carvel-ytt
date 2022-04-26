@@ -111,7 +111,7 @@ func (pp DataValuesPreProcessing) typeAndCheck(dataValuesDoc *yamlmeta.Document)
 	if len(chk.Violations) > 0 {
 		return chk
 	}
-	//Walk function is used to assign @assert:validate annotation from @schema/validation annotation
+	//Walk function is used to update node's meta from @schema/validation annotation
 	_ = yamlmeta.Walk(dataValuesDoc, schema.AssignSchemaValidations{})
 	chk = schema.CheckNode(dataValuesDoc)
 	return chk

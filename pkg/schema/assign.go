@@ -5,8 +5,7 @@ package schema
 
 import (
 	"fmt"
-
-	"github.com/vmware-tanzu/carvel-ytt/pkg/template"
+	"github.com/vmware-tanzu/carvel-ytt/pkg/assertions"
 
 	"github.com/vmware-tanzu/carvel-ytt/pkg/yamlmeta"
 )
@@ -168,15 +167,9 @@ type AssignSchemaValidations struct{}
 // Visit if node's assigned type contains @schema/validation, the assert/validate annotation is added to the node
 // This visitor returns nil if node has no assigned type or when the execution is completed
 func (AssignSchemaValidations) Visit(node yamlmeta.Node) error {
-	if schemaType := node.GetMeta("schema/type"); schemaType != nil {
-		t, ok := schemaType.(Type)
-		if !ok {
-			return nil
-		}
-		if validationsNodeAnn := t.GetValidations(); validationsNodeAnn != nil {
-			anns := template.NewAnnotations(node)
-			anns[AnnotationAssertValidate] = *validationsNodeAnn
-			node.SetAnnotations(anns)
+	if schemaType := GetType(node); schemaType != nil {
+		if rules := schemaType.GetValidations(); rules != nil {
+			assertions.SetValidations(node, rules)
 		}
 	}
 	return nil

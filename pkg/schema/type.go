@@ -6,8 +6,8 @@ package schema
 import (
 	"fmt"
 
+	"github.com/vmware-tanzu/carvel-ytt/pkg/assertions"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/filepos"
-	"github.com/vmware-tanzu/carvel-ytt/pkg/template"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/yamlmeta"
 )
 
@@ -29,7 +29,7 @@ type Type interface {
 	SetExamples([]Example)
 	IsDeprecated() (bool, string)
 	SetDeprecated(bool, string)
-	GetValidations() *template.NodeAnnotation
+	GetValidations() []assertions.Rule
 	String() string
 }
 
@@ -47,13 +47,13 @@ type DocumentType struct {
 	ValueType    Type // typically one of: MapType, ArrayType, ScalarType
 	Position     *filepos.Position
 	defaultValue interface{}
-	validations  *ValidationAnnotation
+	validations  []assertions.Rule
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (t *DocumentType) GetValidations() *template.NodeAnnotation {
+func (t *DocumentType) GetValidations() []assertions.Rule {
 	if t.validations != nil {
-		return &t.validations.nodeAnnotation
+		return t.validations
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ type MapType struct {
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (m *MapType) GetValidations() *template.NodeAnnotation {
+func (m *MapType) GetValidations() []assertions.Rule {
 	return nil
 }
 
@@ -74,13 +74,13 @@ type MapItemType struct {
 	ValueType    Type
 	Position     *filepos.Position
 	defaultValue interface{}
-	validations  *ValidationAnnotation
+	validations  []assertions.Rule
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (t *MapItemType) GetValidations() *template.NodeAnnotation {
+func (t *MapItemType) GetValidations() []assertions.Rule {
 	if t.validations != nil {
-		return &t.validations.nodeAnnotation
+		return t.validations
 	}
 	return nil
 }
@@ -90,11 +90,10 @@ type ArrayType struct {
 	Position      *filepos.Position
 	defaultValue  interface{}
 	documentation documentation
-	//itemValidations *ValidationAnnotation
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (a *ArrayType) GetValidations() *template.NodeAnnotation {
+func (a *ArrayType) GetValidations() []assertions.Rule {
 	return nil
 }
 
@@ -102,13 +101,13 @@ type ArrayItemType struct {
 	ValueType    Type
 	Position     *filepos.Position
 	defaultValue interface{}
-	validations  *ValidationAnnotation
+	validations  []assertions.Rule
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (a *ArrayItemType) GetValidations() *template.NodeAnnotation {
+func (a *ArrayItemType) GetValidations() []assertions.Rule {
 	if a.validations != nil {
-		return &a.validations.nodeAnnotation
+		return a.validations
 	}
 	return nil
 }
@@ -121,7 +120,7 @@ type ScalarType struct {
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (s *ScalarType) GetValidations() *template.NodeAnnotation {
+func (s *ScalarType) GetValidations() []assertions.Rule {
 	return nil
 }
 
@@ -132,7 +131,7 @@ type AnyType struct {
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (a AnyType) GetValidations() *template.NodeAnnotation {
+func (a AnyType) GetValidations() []assertions.Rule {
 	return nil
 }
 
@@ -143,7 +142,7 @@ type NullType struct {
 }
 
 // GetValidations provides validations from @schema/validation for a node
-func (n NullType) GetValidations() *template.NodeAnnotation {
+func (n NullType) GetValidations() []assertions.Rule {
 	return nil
 }
 

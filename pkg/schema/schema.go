@@ -5,7 +5,8 @@ package schema
 
 import (
 	"fmt"
-	
+
+	"github.com/vmware-tanzu/carvel-ytt/pkg/assertions"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/filepos"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/yamlmeta"
 )
@@ -160,7 +161,7 @@ func getValue(node yamlmeta.Node, t Type) (interface{}, error) {
 	return t.GetDefaultValue(), nil
 }
 
-func getValidations(node yamlmeta.Node) (*ValidationAnnotation, error) {
+func getValidations(node yamlmeta.Node) ([]assertions.Rule, error) {
 	ann, err := processOptionalAnnotation(node, AnnotationValidation, nil)
 	if err != nil {
 		return nil, err
@@ -169,7 +170,7 @@ func getValidations(node yamlmeta.Node) (*ValidationAnnotation, error) {
 	if !ok {
 		return nil, nil
 	}
-	return validationAnn, nil
+	return validationAnn.GetRules(), nil
 }
 
 // getValueFromAnn extracts the value from the annotation and validates its type

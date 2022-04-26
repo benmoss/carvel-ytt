@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/k14s/starlark-go/starlark"
+	"github.com/vmware-tanzu/carvel-ytt/pkg/assertions"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/filepos"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/template"
 	"github.com/vmware-tanzu/carvel-ytt/pkg/template/core"
@@ -35,22 +36,14 @@ type Annotation interface {
 
 // ValidationAnnotation is a wrapper for a value provided via @schema/validation annotation
 type ValidationAnnotation struct {
-	nodeAnnotation template.NodeAnnotation
-	pos            *filepos.Position
+	rules []assertions.Rule
+	pos   *filepos.Position
 }
 
-// GetNodeAnn gets the node annotation from @schema/validation annotation
-func (v *ValidationAnnotation) GetNodeAnn() template.NodeAnnotation {
-	return v.nodeAnnotation
-}
-
-// A Rule represents an argument to @schema/validation annotation;
-// it contains a string description of what constitutes a valid value,
-// and a function that asserts the rule against an actual value.
-type Rule struct {
-	Msg       string
-	Assertion starlark.Callable
-	Position  *filepos.Position
+// GetRules gets the node annotation from @schema/validation annotation
+// Maybe we change name rules to validations
+func (v *ValidationAnnotation) GetRules() []assertions.Rule {
+	return v.rules
 }
 
 type TypeAnnotation struct {
@@ -427,6 +420,8 @@ func NewExampleAnnotation(ann template.NodeAnnotation, pos *filepos.Position) (*
 
 // NewValidationAnnotation checks the argument provided via @schema/validation annotation, and returns wrapper for the rules defined
 func NewValidationAnnotation(ann template.NodeAnnotation, pos *filepos.Position) (*ValidationAnnotation, error) {
+	var rules []assertions.Rule
+
 	if len(ann.Kwargs) != 0 {
 		return nil, fmt.Errorf("Invalid @%s annotation - expected @%s to have 2-tuple as argument(s), but found keyword argument (by %s)", AnnotationValidation, AnnotationValidation, ann.Position.AsCompactString())
 	}
@@ -441,16 +436,21 @@ func NewValidationAnnotation(ann template.NodeAnnotation, pos *filepos.Position)
 		if len(ruleTuple) != 2 {
 			return nil, fmt.Errorf("Invalid @%s annotation - expected @%s 2-tuple, but found tuple with length %v (by %s)", AnnotationValidation, AnnotationValidation, len(ruleTuple), ann.Position.AsCompactString())
 		}
-		_, ok = ruleTuple[0].(starlark.String)
+		message, ok := ruleTuple[0].(starlark.String)
 		if !ok {
 			return nil, fmt.Errorf("Invalid @%s annotation - expected first item in the 2-tuple to be a string describing a valid value, but was %s (at %s)", AnnotationValidation, ruleTuple[0].Type(), ann.Position.AsCompactString())
 		}
-		_, ok = ruleTuple[1].(starlark.Callable)
+		lambda, ok := ruleTuple[1].(starlark.Callable)
 		if !ok {
 			return nil, fmt.Errorf("Invalid @%s annotation - expected second item in the 2-tuple to be an assertion function, but was %s (at %s)", AnnotationValidation, ruleTuple[1].Type(), ann.Position.AsCompactString())
 		}
+		rules = append(rules, assertions.Rule{
+			Msg:       message.GoString(),
+			Assertion: lambda,
+			Position:  ann.Position,
+		})
 	}
-	return &ValidationAnnotation{ann, ann.Position}, nil
+	return &ValidationAnnotation{rules, ann.Position}, nil
 }
 
 // NewTypeFromAnn returns type information given by annotation.
