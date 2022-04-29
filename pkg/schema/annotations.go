@@ -17,33 +17,20 @@ import (
 
 // Declare @schema/... annotation names
 const (
-	AnnotationNullable       template.AnnotationName = "schema/nullable"
-	AnnotationType           template.AnnotationName = "schema/type"
-	AnnotationDefault        template.AnnotationName = "schema/default"
-	AnnotationDescription    template.AnnotationName = "schema/desc"
-	AnnotationTitle          template.AnnotationName = "schema/title"
-	AnnotationExamples       template.AnnotationName = "schema/examples"
-	AnnotationDeprecated     template.AnnotationName = "schema/deprecated"
-	TypeAnnotationKwargAny   string                  = "any"
-	AnnotationValidation     template.AnnotationName = "schema/validation"
-	AnnotationAssertValidate template.AnnotationName = "assert/validate"
+	AnnotationNullable     template.AnnotationName = "schema/nullable"
+	AnnotationType         template.AnnotationName = "schema/type"
+	AnnotationDefault      template.AnnotationName = "schema/default"
+	AnnotationDescription  template.AnnotationName = "schema/desc"
+	AnnotationTitle        template.AnnotationName = "schema/title"
+	AnnotationExamples     template.AnnotationName = "schema/examples"
+	AnnotationDeprecated   template.AnnotationName = "schema/deprecated"
+	TypeAnnotationKwargAny string                  = "any"
+	AnnotationValidation   template.AnnotationName = "schema/validation"
 )
 
 type Annotation interface {
 	NewTypeFromAnn() (Type, error)
 	GetPosition() *filepos.Position
-}
-
-// ValidationAnnotation is a wrapper for a value provided via @schema/validation annotation
-type ValidationAnnotation struct {
-	rules []assertions.Rule
-	pos   *filepos.Position
-}
-
-// GetRules gets the node annotation from @schema/validation annotation
-// Maybe we change name rules to validations
-func (v *ValidationAnnotation) GetRules() []assertions.Rule {
-	return v.rules
 }
 
 type TypeAnnotation struct {
@@ -85,6 +72,12 @@ type DeprecatedAnnotation struct {
 type ExampleAnnotation struct {
 	examples []Example
 	pos      *filepos.Position
+}
+
+// ValidationAnnotation is a wrapper for validations provided via @schema/validation annotation
+type ValidationAnnotation struct {
+	rules []assertions.Rule
+	pos   *filepos.Position
 }
 
 // Example contains a yaml example and its description
@@ -496,7 +489,7 @@ func (t *TitleAnnotation) NewTypeFromAnn() (Type, error) {
 }
 
 // NewTypeFromAnn returns type information given by annotation.
-func (ValidationAnnotation) NewTypeFromAnn() (Type, error) {
+func (v *ValidationAnnotation) NewTypeFromAnn() (Type, error) {
 	return nil, nil
 }
 
@@ -536,8 +529,13 @@ func (t *TitleAnnotation) GetPosition() *filepos.Position {
 }
 
 // GetPosition returns position of the source comment used to create this annotation.
-func (ValidationAnnotation) GetPosition() *filepos.Position {
+func (v *ValidationAnnotation) GetPosition() *filepos.Position {
 	return nil
+}
+
+// GetRules gets the validation rules from @schema/validation annotation
+func (v *ValidationAnnotation) GetRules() []assertions.Rule {
+	return v.rules
 }
 
 func (t *TypeAnnotation) IsAny() bool {

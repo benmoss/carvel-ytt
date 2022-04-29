@@ -29,6 +29,7 @@ func NewDocumentType(doc *yamlmeta.Document) (*DocumentType, error) {
 	}
 
 	typeOfValue.SetDefaultValue(defaultValue)
+
 	return &DocumentType{Source: doc, Position: doc.Position, ValueType: typeOfValue, defaultValue: defaultValue, validations: validations}, nil
 }
 
@@ -62,7 +63,7 @@ func NewMapItemType(item *yamlmeta.MapItem) (*MapItemType, error) {
 		return nil, err
 	}
 
-	typeOfValue.SetDefaultValue(defaultValue) //<- sets default value of array(child) if @schema/default is on this map item
+	typeOfValue.SetDefaultValue(defaultValue)
 
 	return &MapItemType{Key: item.Key, ValueType: typeOfValue, defaultValue: defaultValue, Position: item.Position, validations: validations}, nil
 }
@@ -166,10 +167,12 @@ func getValidations(node yamlmeta.Node) ([]assertions.Rule, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	validationAnn, ok := ann.(*ValidationAnnotation)
 	if !ok {
 		return nil, nil
 	}
+
 	return validationAnn.GetRules(), nil
 }
 

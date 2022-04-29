@@ -50,23 +50,10 @@ type DocumentType struct {
 	validations  []assertions.Rule
 }
 
-// GetValidations provides validations from @schema/validation for a node
-func (t *DocumentType) GetValidations() []assertions.Rule {
-	if t.validations != nil {
-		return t.validations
-	}
-	return nil
-}
-
 type MapType struct {
 	Items         []*MapItemType
 	Position      *filepos.Position
 	documentation documentation
-}
-
-// GetValidations provides validations from @schema/validation for a node
-func (m *MapType) GetValidations() []assertions.Rule {
-	return nil
 }
 
 type MapItemType struct {
@@ -77,24 +64,11 @@ type MapItemType struct {
 	validations  []assertions.Rule
 }
 
-// GetValidations provides validations from @schema/validation for a node
-func (t *MapItemType) GetValidations() []assertions.Rule {
-	if t.validations != nil {
-		return t.validations
-	}
-	return nil
-}
-
 type ArrayType struct {
 	ItemsType     Type
 	Position      *filepos.Position
 	defaultValue  interface{}
 	documentation documentation
-}
-
-// GetValidations provides validations from @schema/validation for a node
-func (a *ArrayType) GetValidations() []assertions.Rule {
-	return nil
 }
 
 type ArrayItemType struct {
@@ -104,24 +78,11 @@ type ArrayItemType struct {
 	validations  []assertions.Rule
 }
 
-// GetValidations provides validations from @schema/validation for a node
-func (a *ArrayItemType) GetValidations() []assertions.Rule {
-	if a.validations != nil {
-		return a.validations
-	}
-	return nil
-}
-
 type ScalarType struct {
 	ValueType     interface{}
 	Position      *filepos.Position
 	defaultValue  interface{}
 	documentation documentation
-}
-
-// GetValidations provides validations from @schema/validation for a node
-func (s *ScalarType) GetValidations() []assertions.Rule {
-	return nil
 }
 
 type AnyType struct {
@@ -130,20 +91,10 @@ type AnyType struct {
 	documentation documentation
 }
 
-// GetValidations provides validations from @schema/validation for a node
-func (a AnyType) GetValidations() []assertions.Rule {
-	return nil
-}
-
 type NullType struct {
 	ValueType     Type
 	Position      *filepos.Position
 	documentation documentation
-}
-
-// GetValidations provides validations from @schema/validation for a node
-func (n NullType) GetValidations() []assertions.Rule {
-	return nil
 }
 
 // The total set of supported scalars.
@@ -196,8 +147,7 @@ func (n NullType) GetValueType() Type {
 
 // GetDefaultValue provides the default value
 func (t DocumentType) GetDefaultValue() interface{} {
-	returnItem := &yamlmeta.Document{Value: t.defaultValue, Position: t.Position}
-	return returnItem
+	return &yamlmeta.Document{Value: t.defaultValue, Position: t.Position}
 }
 
 // GetDefaultValue provides the default value
@@ -212,8 +162,7 @@ func (m MapType) GetDefaultValue() interface{} {
 
 // GetDefaultValue provides the default value
 func (t MapItemType) GetDefaultValue() interface{} {
-	returnItem := &yamlmeta.MapItem{Key: t.Key, Value: t.defaultValue, Position: t.Position}
-	return returnItem
+	return &yamlmeta.MapItem{Key: t.Key, Value: t.defaultValue, Position: t.Position}
 }
 
 // GetDefaultValue provides the default value
@@ -625,6 +574,55 @@ func (a *AnyType) SetDeprecated(deprecated bool, notice string) {
 func (n *NullType) SetDeprecated(deprecated bool, notice string) {
 	n.documentation.deprecationNotice = notice
 	n.documentation.deprecated = deprecated
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (t *DocumentType) GetValidations() []assertions.Rule {
+	if t.validations != nil {
+		return t.validations
+	}
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (m *MapType) GetValidations() []assertions.Rule {
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (t *MapItemType) GetValidations() []assertions.Rule {
+	if t.validations != nil {
+		return t.validations
+	}
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (a *ArrayType) GetValidations() []assertions.Rule {
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (a *ArrayItemType) GetValidations() []assertions.Rule {
+	if a.validations != nil {
+		return a.validations
+	}
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (s *ScalarType) GetValidations() []assertions.Rule {
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (a AnyType) GetValidations() []assertions.Rule {
+	return nil
+}
+
+// GetValidations provides validations from @schema/validation for a node
+func (n NullType) GetValidations() []assertions.Rule {
+	return nil
 }
 
 // String produces a user-friendly name of the expected type.
