@@ -119,7 +119,7 @@ jobs:
           COSIGN_EXPERIMENTAL: 'true'
         run: |
           echo "${{ github.token }}" | ko login ghcr.io --username "${{ github.actor }}" --password-stdin
-          img=$(ko build --bare --platform=all -t latest -t ${{ github.sha }} -t $(basename "${{ github.ref }}") ./cmd/vendir)
+          img=$(ko build --bare --platform=all -t latest -t ${{ github.sha }} -t $(basename "${{ github.ref }}") ./cmd/ytt)
           echo "built ${img}"
           cosign sign ${img} \
               -a sha=${{ github.sha }} \
