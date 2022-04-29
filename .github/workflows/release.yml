@@ -103,3 +103,25 @@ jobs:
           ${{steps.get-checksums-from-draft-release.outputs.result}}
           EOF
           )
+  ko:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.17
+          check-latest: true
+      - uses: sigstore/cosign-installer@v2.2.1
+      - uses: imjasonh/setup-ko@v0.4
+      - name: Publish and sign image
+        env:
+          KO_DOCKER_REPO: ghcr.io/${{ github.repository }}
+          COSIGN_EXPERIMENTAL: 'true'
+        run: |
+          echo "${{ github.token }}" | ko login ghcr.io --username "${{ github.actor }}" --password-stdin
+          img=$(ko build --bare --platform=all -t latest -t ${{ github.sha }} -t $(basename "${{ github.ref }}") ./cmd/vendir)
+          echo "built ${img}"
+          cosign sign ${img} \
+              -a sha=${{ github.sha }} \
+              -a run_id=${{ github.run_id }} \
+              -a run_attempt=${{ github.run_attempt }}
