@@ -1,5 +1,5 @@
 [[agents]]
 name = "ben"
-kubernetes = "job.yaml"
+kubernetes = "job.yml"
 [agents.tags]
 foo = "bar"
