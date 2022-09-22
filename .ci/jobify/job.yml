@@ -9,3 +9,4 @@ spec:
         - name: agent
           image: buildkite/agent:3
           args: ["start", "--disconnect-after-job"]
+      restartPolicy: Never
