@@ -1,4 +1,6 @@
 steps:
   - command: echo "hey"
+    agents:
+      foo: "bar"
   - command: sleep 5m
   - command: echo "done"
