@@ -9,4 +9,10 @@ spec:
         - name: agent
           image: buildkite/agent:3
           args: ["start", "--disconnect-after-job"]
+          env:
+            - name: "BUILDKITE_AGENT_TOKEN"
+              valueFrom:
+                secretKeyRef:
+                  key: "token"
+                  name: "buildkite-api"
       restartPolicy: Never
