@@ -1,0 +1,4 @@
+steps:
+  - command: echo "hey"
+  - command: sleep 5m
+  - command: echo "done"
